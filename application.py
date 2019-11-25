@@ -240,7 +240,7 @@ def sell():
     db.execute("INSERT INTO purchases (user_id, stocks, price, company) VALUES (?,?,?,?)",
     session["user_id"], (-int(request.form.get("shares"))), search_dict["price"], search_dict["symbol"])
     db.execute("UPDATE users SET cash = :new_cash WHERE id = :id", new_cash=current_balance[0]["cash"] + profit, id=session["user_id"])
-    return redirect("/")
+    return redirect("index.html")
 
 def errorhandler(e):
     """Handle error"""
