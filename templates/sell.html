@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Sell
+{% endblock %}
+
+{% block main %}
+    <form action="/sell" method="post">
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Choose Category
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#">Textbook</a>
+                <a class="dropdown-item" href="#">Clothes</a>
+                <a class="dropdown-item" href="#">Electronics/Computers</a>
+                <a class="dropdown-item" href="#">Bags and Luggage</a>
+                <a class="dropdown-item" href="#">Bicycles/Scooters</a>
+                <a class="dropdown-item" href="#">Furniture</a>
+                <a class="dropdown-item" href="#">Video Games</a>
+                <a class="dropdown-item" href="#">Other</a>
+            </div>
+        </div>
+        <div class="form-group">
+            <p></p>
+            <input autocomplete="off" autofocus class="form-control" name="item" placeholder="Item" type="text">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="price" placeholder="Price" type="text">
+            <input class="form-control" name="contact" placeholder="Preferred Contact" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">Post</button>
+    </form>
+{% endblock %}

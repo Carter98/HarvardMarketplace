@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Searched
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <form action="/quoted" method="post">
+            <table class="table table-striped">
+                <thead>
+                    <th>Item(s)</th>
+                    <th>Price</th>
+                    <th>Seller</th>
+                    <th>Contact</th>
+
+                </thead>
+
+                <tbody>
+
+
+                    {% for post in search %}
+                    <tr>
+                        <td>{{ post.item }}</td>
+                        <td>{{post.price | usd}}</td>
+                        <td>{{post.seller}}</td>
+                        <td>{{post.contact}}</td>
+
+                    </tr>
+                    {% endfor %}
+
+
+
+                </tbody>
+            </table>
+        </form>
+    </div>
+{% endblock %}

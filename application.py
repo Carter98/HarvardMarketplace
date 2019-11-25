@@ -45,20 +45,10 @@ if not os.environ.get("API_KEY"):
 @app.route("/")
 @login_required
 def index():
-    """Show portfolio of stocks"""
-    search = db.execute("SELECT company, SUM(stocks) AS shares FROM purchases WHERE user_id = :id GROUP BY company HAVING SUM(stocks)>0", id=session["user_id"])
-    current_cash = db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])
-    cash = current_cash[0]["cash"]
-    total = cash
-    for share in search:
-        share["symbol"] = share["company"]
-        shares = share["shares"]
-        lis = lookup(share["company"])
-        share["name"] = lis["name"]
-        share["price"] = lis["price"]
-        total += shares * lis["price"]
+    """Show all posts."""
+    search = db.execute("SELECT item, price, contact, seller FROM posts")
 
-    return render_template("index.html", shares=search, total=total, cash=cash)
+    return render_template("index.html", search=search)
 
 
 
@@ -100,13 +90,10 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    search = db.execute("SELECT * FROM purchases WHERE user_id = :id", id=session["user_id"])
-    for trans in search:
-        print(trans)
-        trans["symbol"] = trans["company"]
-        trans["shares"] = trans["stocks"]
+    search = db.execute("SELECT item, price, contact, seller, time FROM posts WHERE user_id = :id", id=session["user_id"])
 
-    return render_template("history.html", trans=search)
+
+    return render_template("history.html", search=search)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -162,18 +149,15 @@ def logout():
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
-    """Get stock quote."""
+    """Search for a specfic item."""
     # when requested via GET, display search form
     if request.method == "GET":
         return render_template("quote.html")
     # ensure symbol is valid
-    if lookup(request.form.get("symbol")) == None:
-        return apology("invalid symbol", 403)
-    lookup(request.form.get("symbol"))
+    search = request.form.get("search")
+    find = db.execute("SELECT item, price, contact, seller FROM posts WHERE item = ?", search)
     if request.method == "POST":
-        result = lookup(request.form.get("symbol"))
-
-        return render_template("quoted.html", some_list=result)
+        return render_template("quoted.html", search=find)
 
 
 
@@ -214,33 +198,23 @@ def register():
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
-    """Sell shares of stock"""
+    """Add an item to the list"""
     if request.method == "GET":
         return render_template("sell.html")
     # ensure symbol is entered
-    if request.form.get("symbol") == '':
-        return apology("must provide symbol", 403)
+    if request.form.get("item") == '':
+        return apology("must provide item", 403)
     # ensures that symbol is valid
-    if lookup(request.form.get("symbol")) == None:
-        return apology("invalid symbol", 403)
-    shares = db.execute("SELECT SUM(stocks) AS shares FROM purchases WHERE user_id = :id AND company = :company", id = session["user_id"], company=request.form.get("symbol"))
-    # ensure that user own share of this stock
-    if shares[0]["shares"] == None:
-        return apology("you do not own any of this stock")
-    # ensure user is not selling more than they have
-    if int((request.form.get("shares"))) > shares[0]["shares"]:
-        return apology("you do not own enough shares for this sale")
-    # ensures shares is a positive number
-    if int(request.form.get("shares")) < 1:
-        return apology("invalid number of shares")
-    search_dict = lookup(request.form.get("symbol"))
-    current_balance = db.execute("SELECT cash FROM users WHERE id = :id", id=session["user_id"])
-    # calculate profit and update tables
-    profit = search_dict["price"] * int(request.form.get("shares"))
-    db.execute("INSERT INTO purchases (user_id, stocks, price, company) VALUES (?,?,?,?)",
-    session["user_id"], (-int(request.form.get("shares"))), search_dict["price"], search_dict["symbol"])
-    db.execute("UPDATE users SET cash = :new_cash WHERE id = :id", new_cash=current_balance[0]["cash"] + profit, id=session["user_id"])
-    return redirect("index.html")
+
+    if request.form.get("price") == '':
+        return apology("must set price")
+
+    # update tables
+    seller = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
+    seller = seller[0]["username"]
+    db.execute("INSERT INTO posts (user_id, item, price, contact, seller, category) VALUES (?,?,?,?,?,?)",
+    session["user_id"], request.form.get("item"), request.form.get("price"), request.form.get("contact"), seller, "category")
+    return redirect("/")
 
 def errorhandler(e):
     """Handle error"""
