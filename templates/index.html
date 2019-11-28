@@ -1,11 +1,23 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Index
+    Harvard Marketplace
 {% endblock %}
+<div class="sidenav">
+ <div class="search-container">
+    <form action="/action_page.php">
+      <input type="text" placeholder="Search.." name="search">
+      <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+  </div>
+  <a href="#">About</a>
+  <a href="#">Services</a>
+  <a href="#">Clients</a>
+  <a href="#">Contact</a>
+</div>
 
-{% block main %}
-    <div class="container">
+<div class="container">
+    <h2>{{ title }}</h2>
         <form action="/" method="post">
             <table class="table table-striped">
                 <thead>
@@ -13,7 +25,7 @@
                     <th>Price</th>
                     <th>Seller</th>
                     <th>Contact</th>
-
+                    <th>Time</th>
                 </thead>
 
                 <tbody>
@@ -25,7 +37,7 @@
                         <td>{{post.price | usd}}</td>
                         <td>{{post.seller}}</td>
                         <td>{{post.contact}}</td>
-
+                        <td>{{post.time}}</td>
                     </tr>
                     {% endfor %}
 
@@ -35,4 +47,6 @@
             </table>
         </form>
     </div>
+{% block main %}
+
 {% endblock %}

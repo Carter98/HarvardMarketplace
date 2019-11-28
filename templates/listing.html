@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Result
+{% endblock %}
+
+{% block main %}
+    <h2>{{ name }}</h2>
+    <p><b>Price: </b>{{ price | usd }}</p>
+    <p><b>Category: </b>{{ category }}</p>
+    <p><b>Date Posted: </b>{{ time }}</p>
+    <p><b>Description: </b>{{ description }}</p>
+    <h2>Contact the seller if interested!</h2>
+    <p><b>Name: </b>{{ seller }}</p>
+    <p><b>Email: </b>{{ email }}</p>
+    <p><b>Phone: </b>{{ phone }}</p>
+{% endblock %}
+

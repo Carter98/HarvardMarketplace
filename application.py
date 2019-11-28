@@ -35,7 +35,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+db = SQL("sqlite:///marketplace.db")
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
@@ -144,21 +144,6 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
-
-
-@app.route("/quote", methods=["GET", "POST"])
-@login_required
-def quote():
-    """Search for a specfic item."""
-    # when requested via GET, display search form
-    if request.method == "GET":
-        return render_template("quote.html")
-    # ensure symbol is valid
-    search = request.form.get("search")
-    find = db.execute("SELECT item, price, contact, seller FROM posts WHERE item = ?", search)
-    if request.method == "POST":
-        return render_template("quoted.html", search=find)
-
 
 
 @app.route("/register", methods=["GET", "POST"])
