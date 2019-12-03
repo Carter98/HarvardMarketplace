@@ -1,21 +1,21 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Register
+    Profile
 {% endblock %}
 
 {% block main %}
-    <form action="/register" method="post">
+
+    <form action="/profile" method="post">
+        <h1>Update your account information</h1>
         <div class="form-group">
             <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
-        </div>
-        <div class="form-group">
-            <p>Your password must contain at least 6 characters, 1 must be a digit and 1 must be a special character.</p>
             <input class="form-control" name="password" placeholder="Password" type="password">
-            <input class="form-control" name="confirmation" placeholder="Confirmation" type="password">
+            <input class="form-control" name="confirmation" placeholder="Password Confirmation" type="password">
             <input autocomplete="off" autofocus class="form-control" name="email" placeholder="email" type="text">
             <input autocomplete="off" autofocus class="form-control" name="phone_num" placeholder="Phone Number" type="text">
         </div>
-        <button class="btn btn-primary" type="submit">Register</button>
+
+        <button class="btn btn-primary" type="submit">Update</button>
     </form>
 {% endblock %}

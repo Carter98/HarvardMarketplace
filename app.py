@@ -35,11 +35,10 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+db = SQL("sqlite:///marketplace.db")
 
 # Make sure API key is set
-if not os.environ.get("API_KEY"):
-    raise RuntimeError("API_KEY not set")
+
 
 
 @app.route("/")
@@ -188,11 +187,63 @@ def register():
     # ensure that confirmation matches password
     if request.form.get("password") != request.form.get("confirmation"):
         return apology("password and confirmation do not match", 403)
+    if request.form.get("email") == '':
+        return apology("must provide email", 403)
     username = request.form.get("username")
     password = request.form.get("password")
     hashed_pw = generate_password_hash(request.form.get("password"))
-    db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash1)", username=username, hash1=hashed_pw)
+    db.execute("INSERT INTO users (username, hash, email, phone_num) VALUES (?,?,?,?)",
+    username, hashed_pw, request.form.get("email"), request.form.get("phone_num"))
     return redirect("/")
+@app.route("/sell", methods=["GET", "POST"])
+@login_required
+def profile():
+    """Update account information"""
+    # when requested via GET, should display registraion form
+    if request.method == "GET":
+        return render_template("profile.html")
+    # when form is submitted via POST, insert the new user into users table
+    if request.form.get("username") == '':
+        return apology("must provide username", 403)
+    # ensure username is not taken
+    if len(db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))) == 1:
+        return apology("username already exists", 403)
+    # ensure something is entered for password
+    if request.form.get("password") == '':
+        return apology("must provide password", 403)
+    if len(request.form.get("password")) < 6:
+        return apology("password must contain at least 6 characters")
+    if not (re.search("\W", request.form.get("password"))):
+        return apology("password must include special character")
+    if not (re.search("\d", request.form.get("password"))):
+        return apology("password must contain at least one digit")
+    # ensures confirmation is entered
+    if request.form.get("confirmation") == '':
+        return apology("must provide password confirmation", 403)
+    # ensure that confirmation matches password
+    if request.form.get("password") != request.form.get("confirmation"):
+        return apology("password and confirmation do not match", 403)
+    if request.form.get("email") == '':
+        return apology("must provide email", 403)
+    username = request.form.get("username")
+    password = request.form.get("password")
+    hashed_pw = generate_password_hash(request.form.get("password"))
+
+    db.execute("UPDATE users SET username = ?, hash = ?, email = ?, phone_num = ? WHERE id = :id",
+    username, hashed_pw, request.form.get("email"), request.form.get("phone_num"),id=session["user_id"])
+    return redirect("/")
+@app.route("/sell", methods=["GET", "POST"])
+@login_required
+def manage():
+    """Show all the users posted items."""
+    if request.method == "GET":
+        search = db.execute("SELECT name, price, description, category FROM items WHERE seller_id=?", session["user_id"])
+        return render_template("manage.html", search=search)
+    if request.method =="POST":
+        #if request.form.get("activity") == 'deactivate':
+        return redirect("/")
+
+
 
 
 @app.route("/sell", methods=["GET", "POST"])
@@ -202,18 +253,17 @@ def sell():
     if request.method == "GET":
         return render_template("sell.html")
     # ensure symbol is entered
-    if request.form.get("item") == '':
-        return apology("must provide item", 403)
+    if request.form.get("name") == '':
+        return apology("must provide item name", 403)
     # ensures that symbol is valid
 
     if request.form.get("price") == '':
         return apology("must set price")
 
     # update tables
-    seller = db.execute("SELECT username FROM users WHERE id = :id", id = session["user_id"])
-    seller = seller[0]["username"]
-    db.execute("INSERT INTO posts (user_id, item, price, contact, seller, category) VALUES (?,?,?,?,?,?)",
-    session["user_id"], request.form.get("item"), request.form.get("price"), request.form.get("contact"), seller, "category")
+    # have to figure out how to insert image
+    db.execute("INSERT INTO items (seller_id, name, description, price, category, timestamp, isActive, image) VALUES (?,?,?,?,?,?,?,?)",
+    session["user_id"], request.form.get("name"), request.form.get("description"), request.form.get("price"), request.form.get("category"), datetime.now(tz=None),"yes", request.form.get("pic"))
     return redirect("/")
 
 def errorhandler(e):

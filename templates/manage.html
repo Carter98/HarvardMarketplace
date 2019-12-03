@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Manage
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <form action="/" method="post">
+            <table class="table table-striped">
+                <thead>
+                    <th>Item(s)</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Activity</th>
+                    <th>Delete</th>
+
+                </thead>
+
+                <tbody>
+
+
+                    {% for post in search %}
+                    <tr>
+                        <td>{{seacrh.name }}</td>
+                        <td>{{search.price | usd}}</td>
+                        <td>{{search.descrition}}</td>
+                        <td>{{search.category}}</td>
+                        <td>
+                          <div class="form-group">
+                            <select class="form-control" name="activity">
+                                <option disabled selected value>Activate/Deactivate</option>
+                                <option value="dectivate">Activate</option>
+                                <option value="deactivate">Deactivate</option>
+                          </div>
+                        </td>
+                        <td>
+                          <button class="btn btn-primary" type="submit">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+
+
+                </tbody>
+            </table>
+        </form>
+    </div>
+{% endblock %}
